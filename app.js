@@ -51,6 +51,6 @@ app.get('/api/companies',(req, res) => {
 });
 
 //Server listening
-app.listen(443,() =>{
-  console.log('Server started on port 443...');
+app.listen(3000,() =>{
+  console.log('Server started on port 3000...');
 });
