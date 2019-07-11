@@ -9,9 +9,9 @@ app.use(bodyParser.json());
  
 //create database connection
 const conn = mysql.createConnection({
-  host: '192.168.1.64',
-  user: 'resto',
-  password: '182182',
+  host: 'localhost',
+  user: 'usbackapifac',
+  password: 'csjsm182182#Consult@#',
   database: 'apifacturalo',
   // multipleStatements: true, // acepta multimples consultas
 });
