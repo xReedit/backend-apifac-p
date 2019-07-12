@@ -25,13 +25,20 @@ conn.connect((err) =>{
 //show all products
 app.get('/api/documents',(req, res) => {
     const arr = req.body;
-
-    let sql = `SELECT vd.id, d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
+    
+    let sql = `SELECT svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
+            , d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
             , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc
-            , format(d.total_value,2) as subtotal, format((d.total_value-total_exonerated),2) as igv, format(d.total,2) as total, (if (vd.id, 'ANULADO', 'ACEPTADO')) as estado
+            , format(d.total_value,2) as subtotal, format((d.total_value-total_exonerated),2) as igv, format(d.total,2) as total
             , d.series
         from documents as d
             left join voided_details as vd on d.id=vd.document_id
+            left join (
+                SELECT sdt.document_id
+                from summaries as s
+                    inner join summary_details as sdt on sdt.summary_id=s.id
+                where s.process_type_id=3
+            ) as svd on d.id = svd.document_id
             inner join document_types as dt on d.document_type_id=dt.id
         where (d.user_id=${arr.id} and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
         order by d.id desc`;
