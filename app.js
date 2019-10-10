@@ -2,19 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const mysql = require('mysql');
+var config = require('./config');
 // var cors=require('cors');
  
 // parse application/json
 app.use(bodyParser.json());
  
 //create database connection
-const conn = mysql.createConnection({
-  host: 'localhost',
-  user: 'usbackapifac',
-  password: 'csjsm182182#Consult@#',
-  database: 'apifacturalo',
-  // multipleStatements: true, // acepta multimples consultas
-});
+const conn = mysql.createConnection(config);
  
 //connect to database
 conn.connect((err) =>{
@@ -61,6 +56,6 @@ app.get('/api/companies',(req, res) => {
 });
 
 //Server listening
-app.listen(3719,() =>{
+app.listen(config.port,() =>{
   console.log('Server started on port 3719...');
 });
