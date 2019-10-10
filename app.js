@@ -40,8 +40,10 @@ app.get('/api/documents',(req, res) => {
                 where s.process_type_id=3
             ) as svd on d.id = svd.document_id
             inner join document_types as dt on d.document_type_id=dt.id
-        where (d.user_id=${arr.id} and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
+            inner join companies as co on d.user_id = co.user_id 
+        where (co.number='${arr.ruc}' and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
         order by d.date_of_issue desc, d.number desc`;
+
     let query = conn.query(sql, (err, results) => {
         if(err) throw err;
         res.json({"status": 200, "error": null, "data": results});
