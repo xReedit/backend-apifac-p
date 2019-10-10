@@ -9,7 +9,13 @@ var config = require('./config');
 app.use(bodyParser.json());
  
 //create database connection
-const conn = mysql.createConnection(config);
+const conn = mysql.createConnection({
+  host: config.host,
+  user: config.user,
+  password: config.password,
+  database: config.database,
+  // multipleStatements: true, // acepta multimples consultas
+});
  
 //connect to database
 conn.connect((err) =>{
