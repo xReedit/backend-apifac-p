@@ -30,7 +30,7 @@ app.get('/api/documents',(req, res) => {
     let sql = `SELECT svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
             , d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
             , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc
-            , format(d.total_value,2) as subtotal, format(d.tota_igv,2) as igv, format(d.total,2) as total
+            , format(d.total_value,2) as subtotal, format(d.total_igv,2) as igv, format(d.total,2) as total
             , d.series, d.rpt_sunat
         from documents as d
             left join voided_details as vd on d.id=vd.document_id
@@ -59,7 +59,7 @@ app.get('/api2/documents',(req, res) => {
     let sql = `SELECT d.user_id, svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
             , d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
             , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc
-            , format(d.total_value,2) as subtotal, format(d.tota_igv,2) as igv, format(d.total,2) as total
+            , format(d.total_value,2) as subtotal, format(d.total_igv,2) as igv, format(d.total,2) as total
             , d.series
         from documents as d
             left join voided_documents as vd on d.id=vd.document_id
