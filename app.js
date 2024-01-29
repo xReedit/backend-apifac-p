@@ -29,9 +29,12 @@ app.get('/api/documents',(req, res) => {
     
     let sql = `SELECT svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
             , d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
-            , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc
+            , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc, d.customer->>'$.identity_document_type_id' as tipo_doc_id_cliente, d.customer->>'$.number' as num_doc_cliente
             , format(d.total_value,2) as subtotal, format(d.total_igv,2) as igv, format(d.total,2) as total
-            , d.series, d.rpt_sunat
+            , d.series, d.rpt_sunat, d.document_type_id as tipo_doc_id, d.series as serie_doc, d.number as numero_doc, d.currency_type_id as moneda_doc
+            , d.total_prepayment as total_prepago, d.total_discount as total_descuento, d.total_charge as total_cargo, d.total_exportation as total_exportacion, d.total_free as total_gratuito
+            , d.total_taxed as total_gravado, d.total_unaffected as total_inafecto, d.total_exonerated as total_exonerado, d.total_igv as total_igv, d.total_base_isc, d.total_isc as total_isc
+            , d.total_base_other_taxes as total_otros_tributos, d.total_other_taxes as total_otros_cargos, d.total_taxes as total_otros_impuestos, d.total_value as total_valor_venta            
         from documents as d
             left join voided_details as vd on d.id=vd.document_id
             left join (
