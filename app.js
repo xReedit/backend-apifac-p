@@ -8,19 +8,22 @@ var config = require('./config');
 // parse application/json
 app.use(bodyParser.json());
  
-//create database connection
-const conn = mysql.createConnection({
+//create database connection pool
+const pool = mysql.createPool({
+  connectionLimit: 10, // Puedes ajustar este valor
   host: config.host,
   user: config.user,
   password: config.password,
-  database: config.database,
-  // multipleStatements: true, // acepta multimples consultas
+  database: config.database
 });
- 
-//connect to database
-conn.connect((err) =>{
-  if(err) throw err;
-  console.log('Base de datos mysql, online...');
+
+// Test the connection pool
+pool.query('SELECT 1', (err, rows) => {
+    if (err) {
+        console.error('Error al conectar con la base de datos:', err);
+        return;
+    }
+    console.log('Base de datos mysql, online...');
 });
 
 //show all products
@@ -60,7 +63,7 @@ app.get('/api/documents',(req, res) => {
         where d.user_id=${arr.id} and (co.number='${arr.ruc}' and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
         order by d.date_of_issue desc, d.number desc`;
 
-    let query = conn.query(sql, (err, results) => {
+    let query = pool.query(sql, (err, results) => {
         if(err) throw err;
         res.json({"status": 200, "error": null, "data": results});
     });
@@ -89,7 +92,7 @@ app.get('/api2/documents',(req, res) => {
         where (co.number='${arr.ruc}' and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
         order by d.date_of_issue desc, d.number desc`;
 
-    let query = conn.query(sql, (err, results) => {
+    let query = pool.query(sql, (err, results) => {
         if(err) throw err;
         res.json({"status": 200, "error": null, "data": results});
     });
@@ -99,7 +102,7 @@ app.get('/api/companies',(req, res) => {
     const arr = req.body;
 
     let sql = `SELECT user_id, number as ruc, name as razonsocial, trade_name as razoncomercial, DATE_FORMAT(created_at, '%m/%Y') as mes_inicio from companies order by name`;
-    let query = conn.query(sql, (err, results) => {
+    let query = pool.query(sql, (err, results) => {
         if(err) throw err;
         res.json({"status": 200, "error": null, "data": results});
     });
