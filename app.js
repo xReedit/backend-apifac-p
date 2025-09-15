@@ -29,7 +29,8 @@ pool.query('SELECT 1', (err, rows) => {
 //show all products
 app.get('/api/documents',(req, res) => {
     const arr = req.body;
-    
+    console.log('/api/documents -> ', arr.id, ' ruc: ', arr.ruc, ' serie: ', arr.s, ' mes: ', arr.m, ' año: ', arr.y);
+        
     let sql = `SELECT /*+ MAX_EXECUTION_TIME(60000) */ svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
             , d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
             , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc, d.customer->>'$.identity_document_type_id' as tipo_doc_id_cliente, d.customer->>'$.number' as num_doc_cliente
@@ -65,6 +66,7 @@ app.get('/api/documents',(req, res) => {
 
     let query = pool.query(sql, (err, results) => {
         if(err) throw err;
+        console.log(results);
         res.json({"status": 200, "error": null, "data": results});
     });
 });
