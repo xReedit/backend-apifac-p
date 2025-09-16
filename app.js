@@ -79,7 +79,6 @@ app.get('/api/documents',(req, res) => {
         }
         // Con multipleStatements, los resultados de la consulta SELECT son el segundo elemento del array.
         const selectResults = results[1];
-        console.log(selectResults);
         res.json({"status": 200, "error": null, "data": selectResults});
     });
 });
