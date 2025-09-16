@@ -26,6 +26,12 @@ pool.query('SELECT 1', (err, rows) => {
     console.log('Base de datos mysql, online...');
 });
 
+// endpoint inicio y test
+app.get('/api/test',(req, res) => {
+    console.log('test');
+    res.json({"status": 200, "error": null, "data": "test"});
+});
+
 //show all products
 app.get('/api/documents',(req, res) => {
     const arr = req.body;
@@ -112,5 +118,5 @@ app.get('/api/companies',(req, res) => {
 
 //Server listening
 app.listen(config.port,() =>{
-  console.log('Server started on port 3719...');
+  console.log('Server started on port 3719...', config.port);
 });
