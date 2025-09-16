@@ -14,7 +14,8 @@ const pool = mysql.createPool({
   host: config.host,
   user: config.user,
   password: config.password,
-  database: config.database
+  database: config.database,
+  multipleStatements: true // Permitir múltiples sentencias
 });
 
 // Test the connection pool
@@ -37,7 +38,8 @@ app.get('/api/documents',(req, res) => {
     const arr = req.body;
     console.log('/api/documents -> ', arr.id, ' ruc: ', arr.ruc, ' serie: ', arr.s, ' mes: ', arr.m, ' año: ', arr.y);
         
-    let sql = `SELECT /*+ MAX_EXECUTION_TIME(60000) */ svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
+    let sql = `SET SESSION max_execution_time = 160000;
+    SELECT svd.document_id, vd.id, (if (vd.id || svd.document_id, 'ANULADO', 'ACEPTADO')) as estado
             , d.id,DATE_FORMAT(d.date_of_issue, '%d/%m/%Y') as fecha, SUBSTRING_INDEX(dt.description, ' ', 1) as tipo_doc
             , concat(d.series,'-', LPAD(d.number,7, '0')) as num_doc, cast(d.customer->>'$.name' as char(250)) as nom_cliente, cast(d.customer->>'$.number' as char(11)) as ruc, d.customer->>'$.identity_document_type_id' as tipo_doc_id_cliente, d.customer->>'$.number' as num_doc_cliente
             , format(d.total_value,2) as subtotal, format(d.total_igv,2) as igv, format(d.total,2) as total
@@ -75,8 +77,10 @@ app.get('/api/documents',(req, res) => {
             console.error('Error en la consulta /api/documents:', err);
             return res.status(500).json({"status": 500, "error": "Error en la consulta a la base de datos", "data": null});
         }
-        console.log(results);
-        res.json({"status": 200, "error": null, "data": results});
+        // Con multipleStatements, los resultados de la consulta SELECT son el segundo elemento del array.
+        const selectResults = results[1];
+        console.log(selectResults);
+        res.json({"status": 200, "error": null, "data": selectResults});
     });
 });
 
