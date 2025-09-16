@@ -29,7 +29,7 @@ pool.query('SELECT 1', (err, rows) => {
 // endpoint inicio y test
 app.get('/api/test',(req, res) => {
     console.log('test');
-    res.json({"status": 200, "error": null, "data": "test"});
+    res.json({"status": 200, "error": null, "data": "test de prueba datos"});
 });
 
 //show all products
@@ -70,8 +70,11 @@ app.get('/api/documents',(req, res) => {
         where d.user_id=${arr.id} and (co.number='${arr.ruc}' and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
         order by d.date_of_issue desc, d.number desc`;
 
-    let query = pool.query(sql, (err, results) => {
-        if(err) throw err;
+    pool.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error en la consulta /api/documents:', err);
+            return res.status(500).json({"status": 500, "error": "Error en la consulta a la base de datos", "data": null});
+        }
         console.log(results);
         res.json({"status": 200, "error": null, "data": results});
     });
@@ -100,8 +103,12 @@ app.get('/api2/documents',(req, res) => {
         where (co.number='${arr.ruc}' and SUBSTR(d.series,2)='${arr.s}') and (MONTH(d.date_of_issue)=${arr.m} and YEAR(d.date_of_issue)=${arr.y})
         order by d.date_of_issue desc, d.number desc`;
 
-    let query = pool.query(sql, (err, results) => {
-        if(err) throw err;
+    pool.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error en la consulta /api2/documents:', err);
+            return res.status(500).json({"status": 500, "error": "Error en la consulta a la base de datos", "data": null});
+        }
+        console.log(results);
         res.json({"status": 200, "error": null, "data": results});
     });
 });
@@ -110,8 +117,12 @@ app.get('/api/companies',(req, res) => {
     const arr = req.body;
 
     let sql = `SELECT user_id, number as ruc, name as razonsocial, trade_name as razoncomercial, DATE_FORMAT(created_at, '%m/%Y') as mes_inicio from companies order by name`;
-    let query = pool.query(sql, (err, results) => {
-        if(err) throw err;
+    pool.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error en la consulta /api/companies:', err);
+            return res.status(500).json({"status": 500, "error": "Error en la consulta a la base de datos", "data": null});
+        }
+        console.log(results);
         res.json({"status": 200, "error": null, "data": results});
     });
 });
